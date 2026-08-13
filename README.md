@@ -1,3 +1,4 @@
+
 # Prueba Práctica — Unidad IV · Paralelo B
 
 **Ingeniería de Requisitos (ISR-401)**
@@ -13,13 +14,15 @@ Carrera de Ingeniería de Software · Docente: Ing. Gleiston Guerrero, Mg.
 
 ```
 .
-├── main.tex          # Archivo principal (plantilla del docente + desarrollo P1–P10)
+├── main.tex          # Archivo principal: plantilla original del docente
+│                       (inalterada) + \input{respuestas} al final
+├── respuestas.tex     # Desarrollo de las actividades prácticas (P1–P10)
 ├── referencias.bib   # Base bibliográfica (6 entradas citadas con \citep)
 ├── main.pdf          # PDF compilado
-├── figuras/          # Imágenes: capturas del SGA y diagramas escaneados
+├── figuras/          # Capturas del cuestionario del SGA (no los diagramas:
+│                       P1, P2 y P3 están en TikZ dentro de respuestas.tex)
 │   ├── sga_resumen.png
-│   ├── sga_evaluacion.png
-│   └── ...
+│   └── sga_evaluacion.png
 ├── .gitignore        # Excluye archivos auxiliares de LaTeX
 └── README.md         # Este archivo
 ```
@@ -70,7 +73,8 @@ sudo apt-get install texlive-latex-base texlive-latex-recommended \
 - La plantilla original del docente se conserva sin modificaciones. El desarrollo
   de las actividades comienza después de un `\clearpage`, en la sección
   **DESARROLLO DE LAS ACTIVIDADES PRÁCTICAS**.
-- Los diagramas UML (P1, P2, P3) están elaborados en TikZ dentro de `main.tex`;
-  no se requieren archivos externos para reproducirlos.
+- Los diagramas UML (P1, P2, P3) están elaborados en TikZ dentro de
+  `respuestas.tex`; no se requieren archivos externos para reproducirlos.
 - Las capturas del cuestionario del SGA se incluyen en la carátula desde
   `figuras/`.
+
