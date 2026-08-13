@@ -1,0 +1,267 @@
+% =====================================================================
+%  DESARROLLO DE LAS ACTIVIDADES PRACTICAS
+%  Transcripcion del trabajo manuscrito del estudiante
+%  Nieves Sanchez Jimmy Samuel -- 4to Software "B"
+% =====================================================================
+\clearpage
+\setcounter{section}{0}
+\renewcommand{\thesection}{\Roman{section}}
+
+\begin{center}
+	{\color{gold}\rule{\linewidth}{1.2pt}}\\[6pt]
+	{\Large\bfseries\color{darkblue} DESARROLLO DE LAS ACTIVIDADES PR\'ACTICAS}\\[3pt]
+	{\normalsize\color{midblue} Caso: Sistema de Reserva de Citas M\'edicas \textbullet\ Actividades P1--P10}\\[6pt]
+	{\color{gold}\rule{\linewidth}{1.2pt}}
+\end{center}
+
+\vspace{4pt}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}L{2.6cm} X L{2.6cm} X@{}}
+	\hg{Estudiante} & Nieves S\'anchez Jimmy Samuel & \hg{Curso} & 4to Software ``B'' \\
+	\hg{Paralelo} & B & \hg{Asignatura} & Ingenier\'ia de Requisitos (ISR-401) \\
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\begin{tarea}{P1. Modelo de datos --- Diagrama de clases UML}
+Diagrama de clases del dominio con las clases \textsf{Paciente}, \textsf{Cita}, \textsf{M\'edico} y \textsf{Cupo}. Los identificadores se presentan \underline{subrayados}.
+\end{tarea}
+
+\begin{center}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+	font=\small,
+	clase/.style={rectangle split, rectangle split parts=3, draw=darkblue, very thick,
+		rectangle split part align=left, text width=5.2cm, align=left,
+		inner sep=4pt, fill=softblue},
+	rel/.style={draw=darkblue, thick},
+	etq/.style={font=\footnotesize, fill=white, inner sep=1.5pt}
+]
+\node[clase] (pac) at (0,0) {%
+	\textbf{Paciente}
+	\nodepart{two}
+	ID Paciente : Integer\\ \underline{cedula} : String\\ Nombre : String\\ Correo : String
+	\nodepart{three}
+	+ solicitarCita(cita) : void\\ + validarDatos() : Boolean};
+
+\node[clase] (cita) at (9.2,0) {%
+	\textbf{Cita}
+	\nodepart{two}
+	ID Paciente : Integer\\ \underline{ID cita} : String\\ Fecha\_Hora : DateTime\\ Estado : String
+	\nodepart{three}
+	+ Agendar() : Boolean\\ + confirmar() : void\\ + atender() : void\\ + cancelar() : Boolean};
+
+\node[clase] (cupo) at (9.2,-7.4) {%
+	\textbf{Cupo}
+	\nodepart{two}
+	\underline{ID Cupo} : Integer\\ Fecha\_Hora : DateTime\\ Disponibilidad : Boolean
+	\nodepart{three}
+	+ EstaDisponible() : Boolean\\ + Reservar() : void};
+
+\node[clase] (med) at (0,-7.4) {%
+	\textbf{M\'edico}
+	\nodepart{two}
+	\underline{C\'odigo} : String\\ Nombre : String\\ Especialidad : String
+	\nodepart{three}
+	+ ConsultarAgenda(d : Date) : Cupo};
+
+\draw[rel] (pac.east) -- node[etq,pos=0.12]{1} node[etq,pos=0.5,above]{\emph{solicita}} node[etq,pos=0.88]{0..*} (cita.west);
+\draw[rel] (cita.south) -- node[etq,pos=0.12]{0..1} node[etq,pos=0.5,right]{\emph{Reserva}} node[etq,pos=0.9]{1} (cupo.north);
+\draw[rel] (cupo.west) -- node[etq,pos=0.12]{1..*} node[etq,pos=0.5,above]{\emph{Agenda}} node[etq,pos=0.9]{1} (med.east);
+\end{tikzpicture}}
+\end{center}
+
+% =====================================================================
+\clearpage
+\begin{tarea}{P2. Modelo funcional --- Diagrama de actividades UML}
+Proceso \textbf{``Agendar cita''} con carriles de responsabilidad \textsf{Paciente} y \textsf{Sistema}.
+\end{tarea}
+
+\begin{center}
+\resizebox{0.96\linewidth}{!}{%
+\begin{tikzpicture}[
+	font=\small,
+	acc/.style={rectangle, rounded corners=6pt, draw=darkblue, very thick, fill=softblue,
+		text width=4.4cm, align=center, minimum height=1.1cm},
+	dec/.style={diamond, draw=darkblue, very thick, fill=white, aspect=2.4, align=center, inner sep=1pt},
+	mer/.style={diamond, draw=darkblue, very thick, fill=white, aspect=2.4, minimum width=1.2cm, minimum height=0.7cm, inner sep=0pt},
+	ini/.style={circle, fill=darkblue, minimum size=7mm, inner sep=0pt},
+	fin/.style={circle, draw=darkblue, very thick, minimum size=8mm, inner sep=0pt,
+		path picture={\fill[darkblue] (path picture bounding box.center) circle (2.2mm);}},
+	fl/.style={-{Stealth[length=3.5mm]}, thick, draw=darkblue},
+	etq/.style={font=\footnotesize, fill=white, inner sep=1.5pt}
+]
+\draw[very thick,draw=darkblue] (-3.4,1.4) rectangle (3.4,-14.6);
+\draw[very thick,draw=darkblue] (3.4,1.4) rectangle (15.0,-14.6);
+\draw[very thick,draw=darkblue,fill=lightgray] (-3.4,1.4) rectangle (3.4,0.4);
+\draw[very thick,draw=darkblue,fill=lightgray] (3.4,1.4) rectangle (15.0,0.4);
+\node at (0,0.9) {\bfseries\color{darkblue} Paciente};
+\node at (9.2,0.9) {\bfseries\color{darkblue} Sistema};
+
+\node[ini] (i) at (0,-0.6) {};
+\node[acc] (a1) at (0,-2.2) {Seleccionar especialidad m\'edica, Fecha--Hora};
+\node[acc] (a8) at (0,-11.6) {Recibir Confirmaci\'on o Propuesta de otro Horario};
+\node[fin] (f) at (0,-13.6) {};
+
+\node[acc] (a2) at (9.2,-2.2) {Validar datos del Paciente};
+\node[acc] (a3) at (9.2,-4.0) {Crear cita en estado Solicitada};
+\node[acc] (a4) at (9.2,-5.8) {Consultar Agenda del M\'edico};
+\node[dec] (d)  at (9.2,-7.7) {\textquestiondown Cupo Disponible\\ en la Fecha--Hora?};
+\node[acc] (a5) at (5.9,-9.6) {Reservar Cupo};
+\node[acc] (a6) at (12.5,-9.6) {Notificar Cupo No Disponible};
+\node[mer] (m)  at (9.2,-11.2) {};
+\node[acc] (a7) at (9.2,-12.8) {Registrar Resultado en bit\'acora};
+
+\draw[fl] (i) -- (a1);
+\draw[fl] (a1) -- (a2);
+\draw[fl] (a2) -- (a3);
+\draw[fl] (a3) -- (a4);
+\draw[fl] (a4) -- (d);
+\draw[fl] (d) -| node[etq,pos=0.25,above]{S} (a5);
+\draw[fl] (d) -| node[etq,pos=0.25,above]{N} (a6);
+\draw[fl] (a5) |- (m);
+\draw[fl] (a6) |- (m);
+\draw[fl] (m) -- (a7);
+\draw[fl] (a7) -| (4.1,-11.6) -- (a8);
+\draw[fl] (a8) -- (f);
+\end{tikzpicture}}
+\end{center}
+
+% =====================================================================
+\clearpage
+\begin{tarea}{P3. Modelo de comportamiento --- M\'aquina de estados UML}
+Ciclo de vida de una \textsf{Cita}, con superestado para factorizar la transici\'on \emph{Cancelar}.
+\end{tarea}
+
+\begin{center}
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+	font=\small,
+	est/.style={rectangle, rounded corners=8pt, draw=darkblue, very thick, fill=softblue,
+		minimum width=2.8cm, minimum height=1.1cm, align=center},
+	ini/.style={circle, fill=darkblue, minimum size=6mm, inner sep=0pt},
+	fin/.style={circle, draw=darkblue, very thick, minimum size=7mm, inner sep=0pt,
+		path picture={\fill[darkblue] (path picture bounding box.center) circle (2mm);}},
+	fl/.style={-{Stealth[length=3mm]}, thick, draw=darkblue},
+	etq/.style={font=\footnotesize, fill=white, inner sep=1.5pt, align=center}
+]
+\node[ini] (i) at (-3.6,0) {};
+\node[est] (sol) at (0,0) {Solicitada};
+\node[est] (con) at (6.0,0) {Confirmada};
+\node[est] (ate) at (12.4,0) {Atendida};
+\node[est] (can) at (2.0,-5.6) {Cancelada};
+\node[est] (noa) at (9.6,-5.6) {No Asistida};
+\node[fin] (f1) at (5.8,-9.2) {};
+
+\begin{scope}[on background layer]
+\node[draw=darkblue, very thick, rounded corners=10pt, fill=softblue!40,
+	fit=(sol)(con), inner xsep=16pt, inner ysep=24pt] (sup) {};
+\end{scope}
+
+\draw[fl] (i) -- (sol);
+\draw[fl] (sol) -- node[etq,above]{confirmar\\ cupo Disponible} (con);
+\draw[fl] (con) -- node[etq,above]{Atender\\ Paciente Presente} (ate);
+\draw[fl] (sup.south) -- node[etq,left,pos=0.6]{Cancelar} (can.north);
+\draw[fl] (con.south east) -- node[etq,right,pos=0.5]{Paciente No Presente} (noa);
+\draw[fl] (ate.east) -- ++(2.2,0) |- node[etq,pos=0.72,above]{Cerrar} (f1.east);
+\draw[fl] (noa.south) |- (f1.north east);
+\draw[fl] (can.south) |- (f1.north west);
+\end{tikzpicture}}
+\end{center}
+
+% =====================================================================
+\begin{tarea}{P4. Consistencia entre las tres perspectivas}
+Tabla de verificaci\'on cruzada entre los eventos de P3, las funciones de P2 y las entidades o atributos de P1.
+\end{tarea}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}L{2.6cm} X X@{}}
+	\toprule
+	\hd{Evento P3} & \hd{Evento P2} & \hd{Evento P1}\\
+	\midrule
+	solicitar & crear cita en estado Solicitada & Cita.ID cita, Cita.Fecha\_Hora, Cita.Estado $\leftarrow$ Solicitud\\
+	\rowcolor{rowgray}
+	confirmada & Reservar cupo y confirmar cita & Cita.estado $\leftarrow$ confirma\\
+	Rechazada & Notificar No Disponible & Cita.Estado $\leftarrow$ Ning\'un tipo de Atributo\\
+	\rowcolor{rowgray}
+	Atender & (Fuera del alcance P2) & Cita.Estado $\leftarrow$ Atendida\\
+	No Presentarse & Sin Funci\'on en P2 y P1 & Cita.Estado $\leftarrow$ No Asisti\'o\\
+	\rowcolor{rowgray}
+	Cancelar & No existe Atributo de Estado & Cita.Estado $\leftarrow$ Cancelada\\
+	\bottomrule
+\end{tabularx}
+}
+
+% =====================================================================
+\clearpage
+\begin{tarea}{P5. Especificaci\'on de requisitos con esquema de atributos}
+Cuatro requisitos: dos funcionales y dos no funcionales.
+\end{tarea}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}C{1.6cm} X@{}}
+	\toprule
+	\hd{ID} & \hd{Descripci\'on}\\
+	\midrule
+	RF-01 & El sistema deber\'a verificar la disponibilidad de cupo en la agenda del m\'edico al agendar una cita.\\
+	\rowcolor{rowgray}
+	RF-02 & El sistema deber\'a permitir cancelar una cita mientras su estado no sea Atendida.\\
+	RNF-01 & El sistema deber\'a agendar una cita en menos de 3 seg (Eficiencia).\\
+	\rowcolor{rowgray}
+	RNF-02 & El sistema deber\'a almacenar los datos personales cifrados y transmitirse por canal seguro (Seguridad).\\
+	\bottomrule
+\end{tabularx}
+}
+
+\vspace{6pt}
+\textbf{\color{darkblue} M\'etricas y umbral de los requisitos no funcionales}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}C{1.6cm} L{3.2cm} X C{2.8cm}@{}}
+	\toprule
+	\hd{ID} & \hd{Caracter\'istica ISO} & \hd{M\'etrica} & \hd{Umbral}\\
+	\midrule
+	RNF-01 & Eficiencia de desempe\~no & Tiempo de respuesta de la transacci\'on agendar cita, medido en el Percentil 95 con 100 usuarios concurrentes & P95 $<$ 3 seg\\
+	\rowcolor{rowgray}
+	RNF-02 & Seguridad & Porcentaje de campos personales cifrados & 100\% de campos cifrados\\
+	\bottomrule
+\end{tabularx}
+}
+
+\vspace{6pt}
+\textbf{\color{darkblue} Esquema de Atributos}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}C{1.5cm} C{1.5cm} C{1.8cm} L{2.2cm} C{1.7cm} C{1.1cm} X@{}}
+	\toprule
+	\hd{ID} & \hd{Prioridad} & \hd{Estado} & \hd{Fuente} & \hd{Estabilidad} & \hd{Versi\'on} & \hd{M\'etodo de Ver.}\\
+	\midrule
+	RF-01 & Alta & Aprobado & Enunciado del caso & Alta & 1.0 & Prueba demostraci\'on\\
+	\rowcolor{rowgray}
+	RF-02 & Media & Aprobado & Enunciado del caso & Media & 1.0 & Prueba\\
+	RNF-03 & Alta & Propuesto & Enunciado del caso & Media & 1.0 & Prueba de carga medici\'on\\
+	\rowcolor{rowgray}
+	RNF-04 & Alta & Propuesto & Enunciado del caso & Alta & 1.0 & Inspecci\'on de configuraci\'on\\
+	\bottomrule
+\end{tabularx}
+}
+
+% =====================================================================
+\begin{tarea}{P6. Priorizaci\'on MoSCoW}
+Clasificaci\'on de los cuatro requisitos de P5 con su justificaci\'on.
+\end{tarea}
+
+{\small
+\noindent\begin{tabularx}{\linewidth}{@{}C{1.6cm} C{2.4cm} X@{}}
+	\toprule
+	\hd{ID} & \hd{Categor\'ia} & \hd{Justificaci\'on}\\
+	\midrule
+	RF-01 & Must have & Sin verificaci\'on de cupo y confirmaci\'on no existir\'ia reserva de citas.\\
+	\rowcolor{rowgray}
+	RF-02 & Should have & Alto valor operativo, pero la cl\'inica puede operar temporalmente con cancelaci\'on telef\'onica.\\
+	RNF-01 & Could have & El umbral de 3 s mejora la experiencia en ventanilla, pero un tiempo algo mayor no impide agendar.\\
+	\rowcolor{rowgray}
+	RNF-02 & Must have & Los datos de las personas son sensibles, por el motivo de que los pueden utilizar para cosas malas o manipulaci\'on de datos.\\
+	\bottomrule
+\end{tabularx}
+}
